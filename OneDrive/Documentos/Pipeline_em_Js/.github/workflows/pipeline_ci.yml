@@ -56,3 +56,12 @@ node-version: 24
 run: npm install
 - name: Rodar testes
 run: npm test
+
+- name: Análise com SonarCloud
+        uses: SonarSource/sonarcloud-github-action@v2
+        with:
+          args: >
+            -Dsonar.projectKey=COLOQUE_AQUI_A_SUA_CHAVE
+            -Dsonar.organization=COLOQUE_AQUI_A_SUA_ORG
+        env:
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}

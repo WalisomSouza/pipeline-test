@@ -1,67 +1,81 @@
 name: CI - Development
+
 on:
-push:
-branches: [ dev ]
-pull_request:
-branches: [ main ]
+  push:
+    branches: [ dev ]
+  pull_request:
+    branches: [ main ]
+
 jobs:
-quality:
-runs-on: ubuntu-latest
-steps:
-- name: Checkout código
-uses: actions/checkout@v4
-- name: Instalar Node
-uses: actions/setup-node@v4
-with:
-node-version: 24
-- name: Instalar dependências
-run: npm install
-- name: Rodar lint
-run: npm run lint
-build:
-runs-on: ubuntu-latest
-needs: quality
-steps:
-- name: Checkout código
-uses: actions/checkout@v4
-- name: Instalar Node
-uses: actions/setup-node@v4
-with:
-node-version: 24
-- name: Instalar dependências
-run: npm install
-- name: Gerar artefato
-run: zip -r app.zip .
-- name: Publicar artefato
-uses: actions/upload-artifact@v4
-with:
-name: app-build
-path: app.zip
-test:
-runs-on: ubuntu-latest
-needs: build
-steps:
+  quality:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout código
+        uses: actions/checkout@v4
+      - name: Instalar Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 24
+      - name: Instalar dependências
+        run: npm install
+      - name: Rodar lint
+        run: npm run lint
 
-- name: Baixar artefato
-uses: actions/download-artifact@v4
-with:
-name: app-build
-- name: Extrair artefato
-run: unzip app.zip
-- name: Instalar Node
-uses: actions/setup-node@v4
-with:
-node-version: 24
-- name: Instalar dependências
-run: npm install
-- name: Rodar testes
-run: npm test
+  security:
+    runs-on: ubuntu-latest
+    needs: quality
+    steps:
+      - name: Checkout código
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Scan for secrets
+        uses: gitleaks/gitleaks-action@v2
 
-- name: Análise com SonarCloud
+  build:
+    runs-on: ubuntu-latest
+    needs: quality
+    steps:
+      - name: Checkout código
+        uses: actions/checkout@v4
+      - name: Instalar Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 24
+      - name: Instalar dependências
+        run: npm install
+      - name: Gerar artefato
+        run: zip -r app.zip .
+      - name: Publicar artefato
+        uses: actions/upload-artifact@v4
+        with:
+          name: app-build
+          path: app.zip
+
+  test:
+    runs-on: ubuntu-latest
+    needs: build
+    steps:
+      - name: Baixar artefato
+        uses: actions/download-artifact@v4
+        with:
+          name: app-build
+      - name: Extrair artefato
+        run: unzip app.zip
+      - name: Instalar Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 24
+      - name: Instalar dependências
+        run: npm install
+      - name: Rodar testes
+        run: npm test
+
+      - name: Análise com SonarCloud
         uses: SonarSource/sonarcloud-github-action@v2
         with:
           args: >
-            -Dsonar.projectKey=COLOQUE_AQUI_A_SUA_CHAVE
-            -Dsonar.organization=COLOQUE_AQUI_A_SUA_ORG
+            -Dsonar.projectKey= SONAR_TOKEN
+            -Dsonar.organization= SONAR_TOKEN
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}

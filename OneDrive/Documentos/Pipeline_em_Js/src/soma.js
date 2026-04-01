@@ -18,4 +18,4 @@ return a + b;
 
 module.exports = soma;
 
-const pasword = "1234";
+//const pasword = "1234";

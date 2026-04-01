@@ -16,6 +16,14 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: 24
+      
+      # Cache posicionado antes da instalação
+      - name: Cache de dependências
+        uses: actions/cache@v4
+        with:
+          path: ~/.npm
+          key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
+
       - name: Instalar dependências
         run: npm install
       - name: Rodar lint
@@ -42,6 +50,14 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: 24
+
+      # Cache posicionado antes da instalação
+      - name: Cache de dependências
+        uses: actions/cache@v4
+        with:
+          path: ~/.npm
+          key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
+
       - name: Instalar dependências
         run: npm install
       - name: Gerar artefato
@@ -66,6 +82,14 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: 24
+
+      # Cache posicionado antes da instalação
+      - name: Cache de dependências
+        uses: actions/cache@v4
+        with:
+          path: ~/.npm
+          key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
+
       - name: Instalar dependências
         run: npm install
       - name: Rodar testes
@@ -75,7 +99,7 @@ jobs:
         uses: SonarSource/sonarcloud-github-action@v2
         with:
           args: >
-            -Dsonar.projectKey= SONAR_TOKEN
-            -Dsonar.organization= SONAR_TOKEN
+            -Dsonar.projectKey= WalisomSouza_pipeline-test
+            -Dsonar.organization= walisomsouza
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
